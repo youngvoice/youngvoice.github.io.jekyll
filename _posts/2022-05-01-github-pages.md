@@ -1,6 +1,14 @@
-#Directly operate on github website. 
+---
+titile: How use github-pages
+description: to use github-pages based on Jekyll
+categories:
+ - tutorial
+tags: [operate]
+---
 
-#Set up site with Jekyll
+# Directly operate on github website. 
+
+# Set up site with Jekyll
 GitHub Pages and Jekyll
 Jekyll is a static site generator with built-in support for GitHub Pages.
 
