@@ -1,3 +1,10 @@
+---
+title: what story a program has? 
+description: the story of a whole life of program
+categories:
+ - question
+tags: [program]
+---
 # what is a user process
 1. place user program (text + data) into address space to form an image
 2. prepare runtime environment (context)
