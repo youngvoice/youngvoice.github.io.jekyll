@@ -14,7 +14,123 @@ understanding the code was easier once the concepts of the algorithms had been m
 
 the system description is based on UNIX System V Release 2.
 
+
+
+Chapter 1, General overview of the system
+The system combined of programs and services that readily apparent to users and operating system that supports these programs and services.
+the major data structures and algorithms 
+
+1.1 
+The phylosophy of the UNIX system is simplicity and consistency.
+1.2 SYSTEM structure
+the hardware: the hardware provides the operating system with basic services
+
+the operating system interact directly with the hardware, providing common services to programs 
+
+programs interact with the kernel by invoking a well defined set of system calls.
+
+
+programs are easy to move between UNIX systems running on different hardware if the programs do not make assumptions about the underlying hardware.
+
+the set of system calls and the internal algorithms that implement them form the body of the kernel.(系统调用是通向操作系统的大门)
+
+1.3 user perspective
+high-level features of the UNIX system
+##### how the kernel support these features???
+1.3.1 The file system 
+1.3.2 Processing environment
+1.3.3 building block primitives
+1. redirect 
+2. pipe
+
+1.4 Operating system services
+1.5 assumptions about hardware
+two levels: user mode and kernel mode
+address space
+privileged instructions
+
+Put simply, the hardware views the world in terms of kernel mode and user mode.
+The kernel keeps internal records to distinguish the many processes executing on the system.
+
+The kernel is not a separate set of processes that run in parallel to user processes, but it is part of each user process. What the kernel doing various operations meant is that a process executing in kernel mode does the various operations, e.g allocates the resources.
+
+#### who is the kernel services for?(process and interrupt) 
+硬件直接服务的话是不是有点像单片机了？
+
+1.5.1 Interrupts and Exceptions
+exception condition refers to unexpected events caused by a process. 
+interrupts caused by events that are external to a process.
+##### 上面两句话，还是需要考量，比如在执行 interrupt 的时候发生 dividing by zero 的话，如何处理？？？
+
+exceptions happen "in the middle" of the execution of an instruction, the system will attempt restart the instruction after handling the exception;
+interrupts are considered to happen between the execution of two instructions, the system will continue the next instruction after servicing the interrupt.
+
+the UNIX uses one mechanism to handle interrupts and exception conditions.
+
+1.5.2 Processor execution levels
+
+Chapter 2, Intro to the Kernel
+Unix supports the illusions that the file system has "places" and that processes have "life".
+
+##### 关于运行库与系统调用的关系？
+System calls look like ordinary function calls in C programs, and libraries map these function calls to the primitives needed to enter the operating system. Programs frequently use other libraries such as the standard I/O library to provide a more sophisticated use of the system calls. 
+2.2 Intro to system concepts
+2.2.1 An Overview of the File Subsystem
+inode
+in-core inode
+
+
+file table
+user file descriptor table
+inode table
+
+##### what purposes these table used for?
+maintain the state of the file and the user's access to it.
+2.2.2 Processes
+
+1. the byte offset in the file where the user's next read or write will start
+2. access rights  
+
+a process uses a separate stack for each mode.
+##### 对于抢占式内核也是这样的吗？那之前的程序流保存在哪里呢？
+The kernel stack of a process is null when the process executes in user mode.
+
+process 0 becomes the swapper process.
+process 1 known as init
+
+2.2.2.1 context of a process
+The kernel allows a context switch only under specific conditions.  
+
+2.2.2.2 Process states
+A processor can execute only one process at a time, at most one process may be in states 1 and 2. The two states correspond to the two modes of execution, user and kernel.
+this is the static view of a process
+2.2.2.3 State transitions
+processes move continuously between the states.
+A state transition diagram is a directed graph whose nodes represent the states a process can enter and whose edges represent the events that cause a process to move from one state to another.
+State transitions are legal between two states if there exists an edge from the first state to the second.
 # 在本书中，进程在内核中的运行与切换模型（是否抢占）是什么样的？
+
+several processes can execute simultaneously in a time-shared manner, as stated earlier, and they may all run simultaneously in kernel mode. If they were allowed to run in kernel mode without constraint, they could corrupt global kernel data structures. By prohibiting arbitrary context switches and controlling the occurrence of interrupts, the kernel protects its consistency.
+
+The kernel allows a context switch only when a process moves from the state "kernel running" to the state "asleep in memory." Processes running in kernel mode cannot be preempted by other processes; therefore the kernel is sometimes said to be non-preemptive, although the system does preempt processes that are in user mode. The kernel maintains consistency of its data structures because it is non-preemptive, thereby solving the mutual exclusion problem.
+其实，该系统是支持用户空间并行，而不支持内核并行执行。但是当在内核中需要睡眠时，此时的切换是可以进行的。此时，kernel algorithms are encoded to make sure that system data structures are in a safe, consistent state.
+
+A related problem that can cause inconsistency in kernel data is the handling of interrupts, which can change kernel state information. To solve this problem, the system could prevent all interrupts while executing in kernel mode, but that would delay servicing of the interrupt, possibly hurting system throughput. Instead, the kernel raises the processor execution level to prevent interrupts when entering critical regions of code(A section of code is critical if execution of arbitrary interrupt handlers could result in consistency problems 与中断处理有资源共享). 
+
+e.g a disk interrupt handler manipulates the buffer queues, the section of code where the kernel manipulates the buffer queues is a critical region of code with respect to the disk interrupt handler.
+
+Critical regions are small and infrequent so that system throughput is largely unaffected by their existence.
+
+This problem can also be solved by preventing all interrupts when executing in system states or by using elaborate locking schemes to ensure consistency. In multiprocessor systems, the solution outlined here is insufficient.
+
+
+* To conclude, the kernel protects its consistency by allowing a context switch only when a process puts itself to sleep and by preventing one process from changing the state of another process.
+* It also raises the processor execution level around critical regions of code to prevent interrupts that could otherwise cause inconsistencies. 
+* The process scheduler periodically preempts processes executing in user mode so that processes cannot monopolize use of the CPU.
+
+
+2.2.2.4 Sleep and wakeup
+Using "while-sleep" loop insures that at most one process can gain access to a resource.
 
 Chapter 3, The buffer Cache
 
