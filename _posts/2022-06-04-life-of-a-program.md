@@ -6,7 +6,7 @@ categories:
 tags: [program]
 ---
 
-# how we use a computer?
+# how do we use a computer?
 In common, we use a computer through command line or GUI, which all through program.
 
 # what is the composition of a user program?
@@ -159,6 +159,143 @@ finally unlocks the f_pos_lock mutex that protects file position during concurre
 
 ## what will happen when multiple process open the same file to write?
 从用户层面文件是在各个进程之间共享的资源，所以，当同时多个进程打开并写入时，操作系统对写入的顺序没有任何保证，这样很可能会使输出的内容交织在一起无法辨认。
+
+note: 
+1. 程序运行会涉及到文件系统等别的子系统
+
+
+# In order to run a program, what the kernel need do(get into through syscall)?
+the kernel need to handle the following things.
+the main task is load instructions into memory and point the cpu to them.
+and also the kernel need to deal with flexibility in several areas:
+1. different executable formats
+2. shared libraries
+3. other information in the execution context(command-line arguments and environment variables)
+
+
+
+# fork 系统调用如何实现？
+# fork，vfork，clone之间的区别是什么？
+
+# what is executable files?
+An executable file is a regular file that describes how to initialize a new execution context.
+# exec 系统调用如何实现？
+The exec functions is the system call that allows a process to start executing a new program 
+The sys_execve() service routine finds the corresponding file, checks the executable format, and modifies the execution context of the current process according to the information stored in it, then the process starts executing the code stored in the executable file.
+
+It replaces the shell's arguments with new ones passed as parameters in the execve() system call and acquires a new shell environment. All pages inherited from the parent (and shared with the Copy On Write mechanism) are released so that the new computation starts with a fresh User Mode address space; even the privileges of the process could change. However, the new computation inherits from the previous one all open file descriptors that were not closed automatically.
+
+
+
+when a process is created, it always inherits the credentials of its parent. However, these credentials can be modified later, either when the process starts executing a new program or when it issues suitable system calls.
+
+# how does layout the new program segments and process memory regions?
+
+
+
+# what does linux support executable formats?
+In linux, an executable format is described by an object of type linux_binfmt, the type linux_binfmt defined as follow:
+
+```c
+struct linux_binfmt {
+        struct list_head lh;
+        struct module *module;
+        int (*load_binary)(struct linux_binprm *);
+        int (*load_shlib)(struct file *);
+#ifdef CONFIG_COREDUMP
+        int (*core_dump)(struct coredump_params *cprm);
+        unsigned long min_coredump;     /* minimal dump size */
+#endif
+} __randomize_layout;
+
+```
+
+binfmt essentially provides three methods:
+1. load_binary
+2. load_shlib
+3. core_dump
+
+All linux_binfmt objects are included in a singly linked list. Elements can be inserted and removed in the list by invoking the register_binfmt() and unregister_binfmt() functions.
+
+
+# How the linux support bash script?
+The last element in the formats list is always an object decribing the executable format for interpreted scripts. This format defines only the load_binary method. 
+The corresponding load_script() function checks whether the executable file starts with the !# pair of characters. If so, it interprets the rest of the first line as the pathname of another executable file and tries to execute it by passing the name of the script file as a parameter.
+
+# How the linux support the Java program?
+# what does sys_execve() do?
+the kernel implement code of sys_execve() is following:
+```c
+SYSCALL_DEFINE3(execve,
+                const char __user *, filename,
+                const char __user *const __user *, argv,
+                const char __user *const __user *, envp)
+{
+        return do_execve(getname(filename), argv, envp);
+}
+
+```
+filename: the address of the executable file pathname
+argv: the address of a NULL-terminated array of pointers to strings; each string represents a command-line argument.
+envp: the address of a NULL-terminated array of pointers to strings; each string represents an environment variable in the NAME=value format.
+
+```c
+
+do_execve()
+        do_execveat_common()
+                bprm_execve()
+                        sched_exec()
+                        exec_binprm()
+                                search_binary_handler()
+                                        load_binary()
+```
+
+search_binary_handler()
+the function scans the formats list and tries to apply the load_binary method of each element, passing to it the linux_binprm data structure. The scan of the formats list terminates as soon as a load_binary method succeeds in acknowledging the executable format of the file.
+
+
+
+```c
+load_elf_binary()
+        /* Flush all traces of the currently running executable */
+        begin_new_exec();
+        setup_new_exec();
+        setup_arg_pages();
+        /* Now we do a little grungy work by mmapping the ELF image into 
+         * the correct location in memory. 
+         */
+
+
+        /* Sets the values of the start_code, end_code, start_data, end_data, 
+         * start_brk, brk, and start_stack fields of the process's memory descriptor  
+         */
+
+
+        /* Calling set_brk effectively mmaps the pages that we need
+         * for the bss and break sections.  We must do this before
+         * mapping in the interpreter, to make sure it doesn't wind
+         * up getting placed where the bss needs to go.
+         */
+        set_brk();
+        
+        if (interpreter) load_elf_interp();
+
+        
+        /* stores in the binfmt field of the process decriptor the address of the 
+         * linux_binfmt object of the executable format 
+         */
+
+        set_binfmt();
+        create_elf_tables();
+        finalize_exec();
+        START_THREAD();
+
+```
+First of all, some simple consistency checks
+Some simple consistency checks for the interpreter
+Flush all traces of the currently running executable
+
+
 
 # what is the system state when multiple process in progress?(多进程同时执行时的样子如何描述)
 
