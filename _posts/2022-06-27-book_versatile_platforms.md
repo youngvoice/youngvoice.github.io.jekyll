@@ -1,3 +1,11 @@
+---
+title: versatile platforms 
+description: process virtual mechine
+categories:
+ - book
+ - review
+tags: [book]
+---
 
 # 虚拟机需要解决哪些问题？
 虚拟机用来解释执行汇编指令，
