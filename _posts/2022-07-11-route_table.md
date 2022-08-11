@@ -10,12 +10,20 @@ tags: [learning]
 # How to communicate between networks?
 every router creates a boundary between two networks, and their main role is to forward packets from network to the next.
 
+| Target Networks | Next-Hop/Interface |
+| --------- | ---------------------- |
+| 11.11.11.x | eth0 |
+| 22.22.22.x | eth1 |
+| 33.33.33.x | 22.22.22.2(与该路由器在同一网络内的下一跳的路由器ip地址) |
+
+
 routing table
-|Target Networks | Next-Hop/Interface |
-|---------|----------------------|
-|11.11.11.x| eth0 |
-|22.22.22.x| eth1 |
-|33.33.33.x| 22.22.22.2(与该路由器在同一网络内的下一跳的路由器ip地址)|
+
+| Target Networks | Next-Hop/Interface |
+| --- | --- |
+| 11.11.11.x | eth0 |
+| 22.22.22.x | eth1 |
+| 33.33.33.x | 22.22.22.2 |
 
 
 netstat -nr
