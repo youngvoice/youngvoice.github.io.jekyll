@@ -1,3 +1,10 @@
+---
+title: Variadic functions in C
+description: how to work in variadic functions?
+categories:
+ - language
+tags: [learning]
+---
 Variadic functions in C
 
 # How to write a variadic function in C?
