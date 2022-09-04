@@ -411,6 +411,12 @@ kernel_clone();
 
 ```
 
+
+# how to create process or thread through syscall?
+从上面的分析可以看出，无论是创建线程还是创建进程，在内核中都是调用 kernel_clone() 函数, 并且 sys_clone 的参数传递最为灵活。
+
+
+
 # what is executable files?
 An executable file is a regular file that describes how to initialize a new execution context.
 # exec 系统调用如何实现？
