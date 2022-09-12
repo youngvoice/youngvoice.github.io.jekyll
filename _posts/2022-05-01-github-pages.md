@@ -10,29 +10,39 @@ tags: [operate]
 
 # Set up site with Jekyll
 GitHub Pages and Jekyll
+
 Jekyll is a static site generator with built-in support for GitHub Pages.
 
 ## create site with Jekyll
 Prerequisites
+
 install Jekyll and Git
+
 Bundler manages Ruby gem dependencies, reduces Jekyll build errors, and prevents environment-related bugs, so recommend using Bundler to install and run Jekyll. 
+
 1. install Ruby.
 2. install Bundler.
 
->>>>>>>>>>>>>>>
+`>>>>>>>>>>>>>>>`
+
 Creating a repository for your site on github
+
 Creating your site locally using Jekyll
 
 Test local site and Push to github repository
 
 
 
->>>>>>>>>>>>>>>
+`>>>>>>>>>>>>>>>`
 
 Add content to Pages site
+
 About content in Jekyll sites. The main type of content for Jekyll sites are pages and posts. the theme(https://jekyllrb.com/docs/themes/#overriding-theme-defaults) includes default layouts, includes, and stylesheets that will automatically be applied to new pages and posts on your site. To set variables and metadata, such as a title and layout, for a page or post on your site, you can add YAML front matter to the top of any Markdown or HTML file.
+
 you can add a new page or post to your Jekyll site on Github pages.
+
 add a new page to your site
+
 add a new post to your site
 
 About github pages and Jekyll, need continue to learn...
@@ -45,6 +55,7 @@ About github pages and Jekyll, need continue to learn...
 
 ## Add theme to Pages site
 Adding a theme to your GitHub Pages site using Jekyll
+
 _config.yml
 
 ```
