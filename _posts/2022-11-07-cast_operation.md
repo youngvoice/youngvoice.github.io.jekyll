@@ -114,3 +114,22 @@ int main(void)
 计算机确实更侧重于信息的处理！！！
 数据结构也用来表示各种信息
 
+
+# 2 10 16进制相互转换（无符号数）
+# boolean ring
+
+
+
+# integer representations
+# conversions between signed and unsigned
+# expanding the bit representation of a number
+```c
+short sx = -12345;
+unsigned uy = sx;
+```
+the program first changes the size and then the type
+
+这就是，我上面问题的答案！！！
+
+
+
